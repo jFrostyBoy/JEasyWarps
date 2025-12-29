@@ -62,3 +62,8 @@
 - `Цветное имя`: /wset &aЗелёный &bдомик
 - `Иконка`: /wicon Прикольный варп DIAMOND_BLOCK (можно выбрать из появляемого списка ID предметов)
 - `Описание`: /wsetlore Прикольный варп &aТут реально прикольно! &eОтвечаю!!
+
+<img width="574" height="712" alt="Знімок_20251229_231449" src="https://github.com/user-attachments/assets/e077a43d-7de3-46f8-9e7c-870ccf5630cc" />
+<img width="714" height="552" alt="Знімок_20251229_231529" src="https://github.com/user-attachments/assets/08834f70-c4f1-4b27-95ce-a138a8c00a22" />
+<img width="886" height="545" alt="Знімок_20251229_231549" src="https://github.com/user-attachments/assets/4f73a67e-1a55-4767-82f2-dd41c4060aab" />
+<img width="801" height="703" alt="Знімок_20251229_231654" src="https://github.com/user-attachments/assets/52b2f0f6-4d20-41b0-b2b8-03d652adddad" />
