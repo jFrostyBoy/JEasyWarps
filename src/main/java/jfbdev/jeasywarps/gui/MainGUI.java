@@ -13,13 +13,13 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class MainGUI {
 
     private final JEasyWarps plugin;
     private final WarpManager manager;
+    public final Map<UUID, Integer> playerPage = new HashMap<>();
 
     public MainGUI(JEasyWarps plugin, WarpManager manager) {
         this.plugin = plugin;
@@ -27,19 +27,39 @@ public class MainGUI {
     }
 
     public void open(Player p) {
+        open(p, playerPage.getOrDefault(p.getUniqueId(), 0));
+    }
+
+    public void open(Player p, int page) {
+        playerPage.put(p.getUniqueId(), page);
+
         int size = plugin.getConfig().getInt("gui.main.size", 54);
+        int itemsPerPage = plugin.getConfig().getInt("gui.main.items-per-page", 28);
         String title = manager.color(plugin.getConfig().getString("gui.main.title", "&6✦ Варпы ✦"));
         Inventory inv = Bukkit.createInventory(null, size, title);
 
         ItemStack filler = createItem("gui.main.filler");
-        for (int i = 0; i < size; i++) inv.setItem(i, filler);
+        for (int i = 0; i < size; i++) {
+            inv.setItem(i, filler);
+        }
 
-        if (manager.getWarps().isEmpty()) {
-            inv.setItem(plugin.getConfig().getInt("gui.main.no-warps.slot", 22), createItem("gui.main.no-warps"));
+        List<Map.Entry<String, WarpData>> warpList = new ArrayList<>(manager.getWarps().entrySet());
+        int totalWarps = warpList.size();
+        int totalPages = (int) Math.ceil((double) totalWarps / itemsPerPage);
+        int currentPage = Math.max(0, Math.min(page, totalPages - 1));
+
+        int startIndex = currentPage * itemsPerPage;
+        int endIndex = Math.min(startIndex + itemsPerPage, totalWarps);
+
+        if (totalWarps == 0) {
+            ItemStack noWarpsItem = createItem("gui.main.no-warps");
+            inv.setItem(plugin.getConfig().getInt("gui.main.no-warps.slot", 22), noWarpsItem);
         } else {
             int slot = plugin.getConfig().getInt("gui.main.warps-start-slot", 10);
-            for (var entry : manager.getWarps().entrySet()) {
+            for (int i = startIndex; i < endIndex; i++) {
                 if (slot >= size - 9) break;
+
+                var entry = warpList.get(i);
                 String key = entry.getKey();
                 WarpData data = entry.getValue();
                 String display = manager.getDisplay(data, key);
@@ -94,8 +114,7 @@ public class MainGUI {
                         try {
                             ItemFlag flag = ItemFlag.valueOf(flagName.toUpperCase());
                             meta.addItemFlags(flag);
-                        } catch (IllegalArgumentException ignored) {
-                        }
+                        } catch (IllegalArgumentException ignored) {}
                     }
 
                     item.setItemMeta(meta);
@@ -106,6 +125,36 @@ public class MainGUI {
                 if ((slot + 1) % 9 == 8) slot += 2;
             }
         }
+
+        String prevPath = currentPage > 0 ? "gui.main.pagination.previous-page" : "gui.main.pagination.previous-page.no-previous";
+        String nextPath = currentPage < totalPages - 1 ? "gui.main.pagination.next-page" : "gui.main.pagination.next-page.no-next";
+
+        inv.setItem(plugin.getConfig().getInt(prevPath + ".slot", 48), createItem(prevPath));
+        inv.setItem(plugin.getConfig().getInt(nextPath + ".slot", 50), createItem(nextPath));
+
+        ItemStack pageInfo = createItem("gui.main.pagination.page-info");
+        ItemMeta infoMeta = pageInfo.getItemMeta();
+        if (infoMeta != null) {
+            if (infoMeta.hasDisplayName()) {
+                String name = infoMeta.getDisplayName()
+                        .replace("%page%", String.valueOf(currentPage + 1))
+                        .replace("%total%", String.valueOf(Math.max(1, totalPages)))
+                        .replace("%warps%", String.valueOf(totalWarps));
+                infoMeta.setDisplayName(manager.color(name));
+            }
+
+            if (infoMeta.hasLore()) {
+                List<String> lore = new ArrayList<>();
+                for (String line : infoMeta.getLore()) {
+                    lore.add(manager.color(line.replace("%warps%", String.valueOf(totalWarps))));
+                }
+                infoMeta.setLore(lore);
+            }
+
+            pageInfo.setItemMeta(infoMeta);
+        }
+        inv.setItem(plugin.getConfig().getInt("gui.main.pagination.page-info.slot", 49), pageInfo);
+
         p.openInventory(inv);
     }
 
@@ -114,13 +163,19 @@ public class MainGUI {
         Material mat = Material.matchMaterial(matStr.toUpperCase());
         if (mat == null) mat = Material.BLACK_STAINED_GLASS_PANE;
         ItemStack item = new ItemStack(mat);
-        if (plugin.getConfig().contains(path + ".amount")) item.setAmount(plugin.getConfig().getInt(path + ".amount", 1));
+        if (plugin.getConfig().contains(path + ".amount")) {
+            item.setAmount(plugin.getConfig().getInt(path + ".amount", 1));
+        }
 
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            if (plugin.getConfig().contains(path + ".name")) meta.setDisplayName(manager.color(plugin.getConfig().getString(path + ".name")));
+            if (plugin.getConfig().contains(path + ".name")) {
+                meta.setDisplayName(manager.color(plugin.getConfig().getString(path + ".name")));
+            }
             if (plugin.getConfig().contains(path + ".lore")) {
-                meta.setLore(plugin.getConfig().getStringList(path + ".lore").stream().map(manager::color).toList());
+                meta.setLore(plugin.getConfig().getStringList(path + ".lore").stream()
+                        .map(manager::color)
+                        .toList());
             }
             item.setItemMeta(meta);
         }
