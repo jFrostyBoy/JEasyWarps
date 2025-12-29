@@ -1,0 +1,76 @@
+name: JEasyWarps
+version: '${project.version}'
+main: jfbdev.jeasywarps.JEasyWarps
+api-version: '1.16'
+authors: [ jFrostyBoy ]
+softdepend: [LuckPerms]
+description: Плагин варпов с GUI, оценками и кастомными иконками
+
+permissions:
+  jeasywarps.player:
+    description: Доступ к основным командам варпов
+    default: true
+  jeasywarps.admin:
+    description: Админ-команды плагина
+    default: op
+
+commands:
+  warps:
+    description: Открыть меню варпов
+    usage: /warps
+    permission: jeasywarps.player
+
+  warp:
+    description: Телепорт на варп
+    usage: /warp <название>
+    permission: jeasywarps.player
+
+  wset:
+    description: Создать варп
+    usage: /wset <название>
+    permission: jeasywarps.player
+
+  wdel:
+    description: Удалить свой варп
+    usage: /wdel <название>
+    permission: jeasywarps.player
+
+  wrename:
+    description: Переименовать свой варп
+    usage: /wrename <старое> <новое>
+    permission: jeasywarps.player
+
+  wsetlore:
+    description: Установить описание своему варпу
+    usage: /wsetlore <название> <описание>
+    permission: jeasywarps.player
+
+  wdellore:
+    description: Удалить описание у своего варпа
+    usage: /wdellore <название>
+    permission: jeasywarps.player
+
+  wicon:
+    description: Изменить иконку своему варпу
+    usage: /wicon <название> <материал>
+    permission: jeasywarps.player
+
+  jewreload:
+    description: Перезагрузить конфиг плагина
+    usage: /jewreload
+    permission: jeasywarps.admin
+
+  jewdelwarp:
+    description: Удалить любой варп (админ)
+    usage: /jewdelwarp <название>
+    permission: jeasywarps.admin
+
+  jewrelore:
+    description: Изменить описание любого варпа (админ)
+    usage: /jewrelore <название> <описание>
+    permission: jeasywarps.admin
+
+  jewdellore:
+    description: Удалить описание любого варпа (админ)
+    usage: /jewdellore <название>
+    permission: jeasywarps.admin
