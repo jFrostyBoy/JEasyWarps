@@ -56,7 +56,7 @@
 ### Настройка
 - Всё оформление GUI, сообщения, лимиты и флаги иконок-предметов настраиваются в `config.yml`
 - После изменений используйте `/jewreload`
-```yml
+```yaml
 # ╔══════════════════════════════════════════════════════════════════╗
 # ║                     JEasyWarps — config.yml                      ║
 # ║               Полностью настраиваемый конфиг плагина             ║
@@ -102,9 +102,39 @@ gui:
     title: "&8✦ Варпы ✦"
     size: 54
     warps-start-slot: 10
+    items-per-page: 28  # Сколько варпов на одной странице
     filler:
       material: BLACK_STAINED_GLASS_PANE
       name: " "
+    pagination:
+      previous-page:
+        material: ARROW
+        slot: 48
+        name: "&a◄ Назад"
+        lore:
+          - "&7Предыдущая страница"
+        no-previous:
+          material: RED_STAINED_GLASS_PANE
+          name: "&c◄ Нет страницы"
+          lore:
+            - "&7Это первая страница"
+      next-page:
+        material: ARROW
+        slot: 50
+        name: "&aВперёд ►"
+        lore:
+          - "&7Следующая страница"
+        no-next:
+          material: RED_STAINED_GLASS_PANE
+          name: "&cНет страницы ►"
+          lore:
+            - "&7Это последняя страница"
+      page-info:
+        material: PAPER
+        slot: 49
+        name: "&eСтраница &b%page%&7/&b%total%"
+        lore:
+          - "&7Всего варпов: &f%warps%"
     no-warps:
       material: BARRIER
       slot: 22
