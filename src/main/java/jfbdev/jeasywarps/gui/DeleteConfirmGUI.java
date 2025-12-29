@@ -9,6 +9,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DeleteConfirmGUI {
 
     private final JEasyWarps plugin;
@@ -26,18 +29,18 @@ public class DeleteConfirmGUI {
         String title = manager.color(plugin.getConfig().getString("gui.delete-confirm.title", "&cУдалить варп: &e%warp%").replace("%warp%", display));
         Inventory inv = Bukkit.createInventory(null, plugin.getConfig().getInt("gui.delete-confirm.size", 27), title);
 
-        ItemStack filler = createItem("gui.delete-confirm.filler");
+        ItemStack filler = createItem("gui.delete-confirm.filler", display);
         for (int i = 0; i < inv.getSize(); i++) {
             inv.setItem(i, filler);
         }
 
-        inv.setItem(plugin.getConfig().getInt("gui.delete-confirm.confirm.slot"), createItem("gui.delete-confirm.confirm"));
-        inv.setItem(plugin.getConfig().getInt("gui.delete-confirm.cancel.slot"), createItem("gui.delete-confirm.cancel"));
+        inv.setItem(plugin.getConfig().getInt("gui.delete-confirm.confirm.slot"), createItem("gui.delete-confirm.confirm", display));
+        inv.setItem(plugin.getConfig().getInt("gui.delete-confirm.cancel.slot"), createItem("gui.delete-confirm.cancel", display));
 
         p.openInventory(inv);
     }
 
-    private ItemStack createItem(String path) {
+    private ItemStack createItem(String path, String warpDisplay) {
         String matStr = plugin.getConfig().getString(path + ".material", "BLACK_STAINED_GLASS_PANE");
         Material mat = Material.matchMaterial(matStr.toUpperCase());
         if (mat == null) mat = Material.BLACK_STAINED_GLASS_PANE;
@@ -50,13 +53,18 @@ public class DeleteConfirmGUI {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             if (plugin.getConfig().contains(path + ".name")) {
-                meta.setDisplayName(manager.color(plugin.getConfig().getString(path + ".name")));
+                String name = plugin.getConfig().getString(path + ".name");
+                meta.setDisplayName(manager.color(name));
             }
+
             if (plugin.getConfig().contains(path + ".lore")) {
-                meta.setLore(plugin.getConfig().getStringList(path + ".lore").stream()
-                        .map(manager::color)
-                        .toList());
+                List<String> lore = new ArrayList<>();
+                for (String line : plugin.getConfig().getStringList(path + ".lore")) {
+                    lore.add(manager.color(line.replace("%warp%", warpDisplay)));
+                }
+                meta.setLore(lore);
             }
+
             item.setItemMeta(meta);
         }
         return item;
